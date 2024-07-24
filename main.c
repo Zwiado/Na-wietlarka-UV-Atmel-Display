@@ -49,12 +49,19 @@ int main(void)
         number--; // odejmij sekundę 
         timer_flag = 0; 
         while (!timer_flag) {
-            if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty
+            if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
             if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
                 number += 10;
                 while (!(PINA & (1 << PA0))); // Czekanie na przycisk
             }
+			
+        }          
+			if (!(PINA & (1 << PA1))) { // Czy przycisk wciśnięty -
+			if (!(PINA & (1 << PA1))) { // Nadal wciśnięty?
+	        number -= 10;
+	        while (!(PINA & (1 << PA1))); // Czekanie na przycisk
         }
         }
     }
-}
+		}
+	}
