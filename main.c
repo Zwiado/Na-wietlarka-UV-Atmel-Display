@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #define F_CPU 1000000UL
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "led_7seg.h"
 
 volatile uint16_t number = 5000; //domyślny czas naświetlania
@@ -41,7 +42,8 @@ int main(void)
     initTimer1();
 	cy0 = mode; //wyświetlenie wybranego trybu
     while(1)
-    {
+    {	
+		_delay_ms(1000);
 		 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
 			 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
 				 mode += 1; //Kolejny tryb
@@ -51,7 +53,22 @@ int main(void)
 				 cy0 = mode; //wyświetlenie wybranegi trybu
 				 while (!(PINA & (1 << PA0))); // Czekanie na przycisk
 			 }
-			
+		 }
+				 if (!(PINA & (1 << PA1))) { // start naświetlania
+			     _delay_ms(1000);
+				 if(mode == 1){
+					 number = 50;
+				 }
+				 if(mode == 2){
+					 number = 100;
+				 }
+				 if(mode == 3){
+					 number = 150;
+				 }
+				 if(mode == 4){
+					 number = 9999;
+				 }
+				 
 		while(1)
 		{
         cy0 = number % 10;
@@ -83,5 +100,6 @@ int main(void)
         }
     }
 		}
-		 }
+		 
+				 }
 	}
