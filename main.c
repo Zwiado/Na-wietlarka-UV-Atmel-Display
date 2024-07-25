@@ -39,14 +39,19 @@ int main(void)
     d_led_init();
     sei();
     initTimer1();
+	cy0 = mode; //wyświetlenie wybranego trybu
     while(1)
     {
 		 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
 			 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
-				 mode += 1;
+				 mode += 1; //Kolejny tryb
+				 if(mode > 4) {
+					 mode = 1; // Powrót do trybu 1 po przekroczeniu trybu 4 (ostatniego)
+				 }
+				 cy0 = mode; //wyświetlenie wybranegi trybu
 				 while (!(PINA & (1 << PA0))); // Czekanie na przycisk
 			 }
-        
+			
 		while(1)
 		{
         cy0 = number % 10;
@@ -59,6 +64,9 @@ int main(void)
             if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
             if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
                 number += 10;
+				if(number > 9999) {
+					number = 0; //  za mało liczb na wyświetlaczu mój panie
+				}
                 while (!(PINA & (1 << PA0))); // Czekanie na przycisk
             }
 			
@@ -66,6 +74,9 @@ int main(void)
 			if (!(PINA & (1 << PA1))) { // Czy przycisk wciśnięty -
 			if (!(PINA & (1 << PA1))) { // Nadal wciśnięty?
 	        number -= 10;
+			if(number < 0) {
+				 number = 0; //  a kysz dla ujemnego czasu
+			 }
 	        while (!(PINA & (1 << PA1))); // Czekanie na przycisk
 			}
         }
