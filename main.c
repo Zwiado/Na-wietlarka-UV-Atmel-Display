@@ -41,9 +41,9 @@ int main(void)
     sei();
     initTimer1();
 	cy0 = mode; //wyświetlenie wybranego trybu
+	_delay_ms(1000);
     while(1)
     {	
-		_delay_ms(1000);
 		 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
 			 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
 				 mode += 1; //Kolejny tryb
@@ -55,9 +55,11 @@ int main(void)
 			 }
 		 }
 				 if (!(PINA & (1 << PA1))) { // start naświetlania
-			     _delay_ms(1000);
+			     if (!(PINA & (1 << PA0))) {
+				 }
+				 while (!(PINA & (1 << PA1))); // Czekanie na przycisk
 				 if(mode == 1){
-					 number = 50;
+					 number = 11;
 				 }
 				 if(mode == 2){
 					 number = 100;
@@ -76,6 +78,22 @@ int main(void)
         cy2 = (number / 100) % 10;
         cy3 = (number / 1000) % 10;
         number--; // odejmij sekundę 
+		if(number == 0){
+			_delay_ms(1000);
+			while (1){
+				cy0 = 14;
+				cy1 = 14;
+				cy2 = 14;
+				cy3 = 14;
+				_delay_ms(1000);
+				cy0 = 0;
+				cy1 = 0;
+				cy2 = 0;
+				cy3 = 0;
+				_delay_ms(1000);
+			}
+		}
+		
         timer_flag = 0; 
         while (!timer_flag) {
             if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
@@ -92,7 +110,7 @@ int main(void)
 			if (!(PINA & (1 << PA1))) { // Nadal wciśnięty?
 	        number -= 10;
 			if(number < 0) {
-				 number = 0; //  a kysz dla ujemnego czasu
+				 number = 1; //  a kysz dla ujemnego czasu
 			 }
 	        while (!(PINA & (1 << PA1))); // Czekanie na przycisk
 			}
