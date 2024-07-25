@@ -13,6 +13,7 @@
 
 volatile uint16_t number = 5000; //domyślny czas naświetlania
 volatile uint8_t timer_flag = 0;	//przerwanie
+volatile uint8_t mode = 1; //tryb 1-Ścieżki pcb 2-soldermaska 3- kasowanie eeprom 4 - bez okresu np. bielenie obudowy
 
 void initPorts() {
     DDRA &= ~(1 << PA0); // wejście 
@@ -40,8 +41,14 @@ int main(void)
     initTimer1();
     while(1)
     {
+		 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
+			 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
+				 mode += 1;
+				 while (!(PINA & (1 << PA0))); // Czekanie na przycisk
+			 }
         
-
+		while(1)
+		{
         cy0 = number % 10;
         cy1 = (number / 10) % 10;
         cy2 = (number / 100) % 10;
@@ -60,8 +67,10 @@ int main(void)
 			if (!(PINA & (1 << PA1))) { // Nadal wciśnięty?
 	        number -= 10;
 	        while (!(PINA & (1 << PA1))); // Czekanie na przycisk
+			}
         }
         }
     }
 		}
+		 }
 	}
