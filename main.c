@@ -10,13 +10,17 @@
 #define F_CPU 1000000UL
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <avr/wdt.h>
 #include "led_7seg.h"
 
-volatile uint16_t number = 5000; //domyślny czas naświetlania
+void (*Reset_AVR)( void ) = 0x0000;
+
+volatile uint16_t number = 1; //zmienna czasu naświetlania
 volatile uint8_t timer_flag = 0;	//przerwanie
 volatile uint8_t mode = 1; //tryb 1-Ścieżki pcb 2-soldermaska 3- kasowanie eeprom 4 - bez okresu np. bielenie obudowy
 
 void initPorts() {
+	DDRB |= (1<<DDB4);
     DDRA &= ~(1 << PA0); // wejście 
     PORTA |= (1 << PA0); // pullup
 	DDRA &= ~(1 << PA1);
@@ -73,6 +77,7 @@ int main(void)
 				 
 		while(1)
 		{
+		PORTB |= (1<<PORTB1); // włączenie przekaźnika
         cy0 = number % 10;
         cy1 = (number / 10) % 10;
         cy2 = (number / 100) % 10;
@@ -81,16 +86,31 @@ int main(void)
 		if(number == 0){
 			_delay_ms(1000);
 			while (1){
+				PORTB &= ~ (1<<PORTB1); //wyłączenie przekaźnika
 				cy0 = 14;
 				cy1 = 14;
 				cy2 = 14;
 				cy3 = 14;
-				_delay_ms(1000);
+				 timer_flag = 0;
+				 while (!timer_flag) {
+					 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
+						 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
+							 Reset_AVR();
+						 }
+					 }
+				 }
 				cy0 = 0;
 				cy1 = 0;
 				cy2 = 0;
 				cy3 = 0;
-				_delay_ms(1000);
+				 timer_flag = 0;
+				 while (!timer_flag) {
+					 if (!(PINA & (1 << PA0))) { // Czy przycisk wciśnięty +
+						 if (!(PINA & (1 << PA0))) { // Nadal wciśnięty?
+							 Reset_AVR();
+						 }
+					 }
+			}
 			}
 		}
 		
