@@ -9,7 +9,6 @@
 #include <avr/io.h>
 #define F_CPU 1000000UL
 #include <avr/interrupt.h>
-#include <avr/wdt.h>
 #include <util/delay.h>
 
 #include "led_7seg.h"
