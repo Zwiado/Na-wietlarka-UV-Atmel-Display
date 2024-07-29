@@ -51,9 +51,12 @@ void initTimer1() {
 
 	  if (!(PINB & (1 << PB7))) {  // Czy przycisk wciśnięty?
 		  if (!(PINB & (1 << PB7))) {  // Nadal wciśnięty?
-			  number -= 10;
-			  if (number < 0) {
-				  number = 1;  //  a kysz dla ujemnego czasu
+			  if (number > 10) {
+				  number -= 10;
+			  }
+			  if (number < 10) {
+				  number -= number-1;  //  a kysz dla ujemnego czasu
+				  
 			  }
 			  while (!(PINB & (1 << PB7)))
 			  ;  // Czekanie na zwolnienie przycisku
@@ -152,6 +155,11 @@ int main(void) {
             timer_flag = 0;
             while (!timer_flag) {
               updateNumber();
+			  if (!(PINA & (1 << PA0))) {    // Czy przycisk wciśnięty +
+				  if (!(PINA & (1 << PA0))) {  // Nadal wciśnięty?
+					  Reset_AVR();
+				  }
+			  }
               }
             }
           }
@@ -159,4 +167,3 @@ int main(void) {
       }
     }
 }
-
