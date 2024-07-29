@@ -37,6 +37,35 @@ void initTimer1() {
   TIMSK |= (1 << OCIE1A);
 }
 
+  void updateNumber() {
+	  if (!(PINA & (1 << PA1))) {  // Czy przycisk wciśnięty?
+		  if (!(PINA & (1 << PA1))) {  // Nadal wciśnięty?
+			  number += 10;
+			  if (number > 9999) {
+				  number = 0;  //  za mało liczb na wyświetlaczu mój panie
+			  }
+			  while (!(PINA & (1 << PA1)))
+			  ;  // Czekanie na zwolnienie przycisku
+		  }
+	  }
+
+	  if (!(PINB & (1 << PB7))) {  // Czy przycisk wciśnięty?
+		  if (!(PINB & (1 << PB7))) {  // Nadal wciśnięty?
+			  number -= 10;
+			  if (number < 0) {
+				  number = 1;  //  a kysz dla ujemnego czasu
+			  }
+			  while (!(PINB & (1 << PB7)))
+			  ;  // Czekanie na zwolnienie przycisku
+		  }
+	  }
+  }
+  void ShowNumber(){
+	  				   cy0 = number % 10;
+	  				   cy1 = (number / 10) % 10;
+	  				   cy2 = (number / 100) % 10;
+	  				   cy3 = (number / 1000) % 10;
+  }
 ISR(TIMER1_COMPA_vect) { timer_flag = 1; }
 
 int main(void) {
@@ -45,7 +74,7 @@ int main(void) {
   sei();
   initTimer1();
   cy0 = mode;  // wyświetlenie wybranego trybu
-  _delay_ms(1000);
+  _delay_ms(3000); //aby po resecie nie przechodził od razu do naświetlania
   while (1) {
     if (!(PINA & (1 << PA1))) {    // Czy przycisk wciśnięty +
       if (!(PINA & (1 << PA1))) {  // Nadal wciśnięty?
@@ -58,34 +87,41 @@ int main(void) {
           ;  // Czekanie na przycisk
       }
     }
-    if (!(PINA & (1 << PA0))) {  // start naświetlania
+    if (!(PINA & (1 << PA0))) { 
       if (!(PINA & (1 << PA0))) {
       }
       while (!(PINA & (1 << PA0)))
         ;  // Czekanie na przycisk
       if (mode == 1) {
-        number = 11;
+        number = 180;
       }
       if (mode == 2) {
         number = 100;
       }
       if (mode == 3) {
-        number = 150;
+        number = 3600;
       }
       if (mode == 4) {
         number = 9999;
       }
+
+			   while (1) {
+					ShowNumber();
+				   updateNumber();
+				 if (!(PINA & (1 << PA0))) {  // start naświetlania
+		      if (!(PINA & (1 << PA0))) {
+		      }
+		      while (!(PINA & (1 << PA0)))
+		      ;  // Czekanie na przycisk
           while (1) {
-            PORTB |= (1 << PORTB1);  // włączenie przekaźnika
-            cy0 = number % 10;
-            cy1 = (number / 10) % 10;
-            cy2 = (number / 100) % 10;
-            cy3 = (number / 1000) % 10;
+			_delay_ms(1000);
+            PORTB |= (1 << PORTB4);  // włączenie przekaźnika
+			ShowNumber();
             number--;  // odejmij sekundę
             if (number == 0) {
               _delay_ms(1000);
               while (1) {
-                PORTB &= ~(1 << PORTB1);  // wyłączenie przekaźnika
+                PORTB &= ~(1 << PORTB4);  // wyłączenie przekaźnika
                 cy0 = 14;
                 cy1 = 14;
                 cy2 = 14;
@@ -115,29 +151,12 @@ int main(void) {
 
             timer_flag = 0;
             while (!timer_flag) {
-              if (!(PINA & (1 << PA1))) {    // Czy przycisk wciśnięty +
-                if (!(PINA & (1 << PA1))) {  // Nadal wciśnięty?
-                  number += 10;
-                  if (number > 9999) {
-                    number = 0;  //  za mało liczb na wyświetlaczu mój panie
-                  }
-                  while (!(PINA & (1 << PA1)))
-                    ;  // Czekanie na przycisk
-                }
-              }
-              if (!(PINB & (1 << PB7))) {    // Czy przycisk wciśnięty -
-                if (!(PINB & (1 << PB7))) {  // Nadal wciśnięty?
-                  number -= 10;
-                  if (number < 0) {
-                    number = 1;  //  a kysz dla ujemnego czasu
-                  }
-                  while (!(PINB & (1 << PB7)))
-                    ;  // Czekanie na przycisk
-                }
+              updateNumber();
               }
             }
           }
         }
       }
     }
-  
+}
+
