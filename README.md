@@ -5,6 +5,6 @@ Do kodu należy dodać bibliotekę led_7seg dostępną na stronie https://grylew
 Funkcjonalności:
 Wybór trybu (presety czasu załączenia przekaźnika)
 Maksymalny czas - 9999 sekund
-Możliwości dostosowania czasu w razie potrzeby przed startem odliczania (już niedługo)
+Możliwości dostosowania czasu w razie potrzeby przed startem odliczania
 
 
